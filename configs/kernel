@@ -150,7 +150,7 @@ CONFIG_BUG=y
 # CONFIG_EPOLL is not set
 # CONFIG_SIGNALFD is not set
 CONFIG_TIMERFD=y
-# CONFIG_EVENTFD is not set
+CONFIG_EVENTFD=y
 # CONFIG_AIO is not set
 CONFIG_IO_URING=y
 CONFIG_ADVISE_SYSCALLS=y
@@ -1041,7 +1041,23 @@ CONFIG_I2C=y
 CONFIG_I2C_BOARDINFO=y
 CONFIG_I2C_COMPAT=y
 CONFIG_I2C_CHARDEV=y
-# CONFIG_I2C_MUX is not set
+CONFIG_I2C_MUX=y
+
+#
+# Multiplexer I2C Chip support
+#
+# CONFIG_I2C_ARB_GPIO_CHALLENGE is not set
+# CONFIG_I2C_MUX_GPIO is not set
+# CONFIG_I2C_MUX_GPMUX is not set
+# CONFIG_I2C_MUX_LTC4306 is not set
+# CONFIG_I2C_MUX_PCA9541 is not set
+# CONFIG_I2C_MUX_PCA954x is not set
+# CONFIG_I2C_MUX_PINCTRL is not set
+# CONFIG_I2C_MUX_REG is not set
+# CONFIG_I2C_DEMUX_PINCTRL is not set
+# CONFIG_I2C_MUX_MLXCPLD is not set
+# end of Multiplexer I2C Chip support
+
 CONFIG_I2C_HELPER_AUTO=y
 
 #
@@ -1991,6 +2007,8 @@ CONFIG_STM32_ADC=y
 #
 # CONFIG_BMI160_I2C is not set
 # CONFIG_KMX61 is not set
+CONFIG_INV_MPU6050_IIO=y
+CONFIG_INV_MPU6050_I2C=y
 # CONFIG_IIO_ST_LSM6DSX is not set
 # end of Inertial measurement units
 
@@ -2067,7 +2085,7 @@ CONFIG_STM32_ADC=y
 #
 # Triggers - standalone
 #
-# CONFIG_IIO_INTERRUPT_TRIGGER is not set
+CONFIG_IIO_INTERRUPT_TRIGGER=y
 CONFIG_IIO_STM32_TIMER_TRIGGER=y
 # CONFIG_IIO_SYSFS_TRIGGER is not set
 # end of Triggers - standalone
