@@ -1,7 +1,7 @@
 url_buildroot = https://github.com/buildroot/buildroot.git
 dir_configs = configs
 dir_buildroot = buildroot
-commit_buildroot = e2e57d56787b7a7d24ed3f9a97902d2bbd58c190
+commit_buildroot = 2020.02.5
 dir_publish = /srv/tftp/stm32f769/
 
 bootstrap:
