@@ -250,7 +250,7 @@ CONFIG_BOOTSTAGE_STASH_SIZE=0x1000
 # CONFIG_SPI_BOOT is not set
 CONFIG_BOOTDELAY=0
 CONFIG_USE_BOOTARGS=y
-CONFIG_BOOTARGS="console=ttySTM0,115200n8 loglevel=11 debug root=/dev/mmcblk0p2 rw rootfstype=ext4 rootwait boot_delay=5 noinitrd"
+CONFIG_BOOTARGS="console=ttySTM0,115200 earlyprintk consoleblank=0 ignore_loglevel"
 CONFIG_USE_BOOTCOMMAND=y
 CONFIG_BOOTCOMMAND="run conditionalboot"
 # CONFIG_USE_PREBOOT is not set

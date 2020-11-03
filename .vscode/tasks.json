@@ -1,0 +1,62 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Rebuild (all)",
+            "type": "shell",
+            "command": "make clean && make bootstrap && make build"
+        },
+        {
+            "label": "Bootstrap",
+            "type": "shell",
+            "command": "make bootstrap"
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "make build"
+        },
+        {
+            "label": "Linux rebuild",
+            "type": "shell",
+            "command": "make linux_rebuild"
+        },
+        {
+            "label": "Linux rebuild (all)",
+            "type": "shell",
+            "command": "make linux_rebuild ARGS=all"
+        },
+        {
+            "label": "Linux reconfigure",
+            "type": "shell",
+            "command": "make linux_reconfigure"
+        },
+        {
+            "label": "Linux reconfigure (all)",
+            "type": "shell",
+            "command": "make linux_reconfigure ARGS=all"
+        },
+        {
+            "label": "U-Boot rebuild",
+            "type": "shell",
+            "command": "make uboot_rebuild"
+        },
+        {
+            "label": "U-Boot flash",
+            "type": "shell",
+            "command": "make flash_bootloader"
+        },
+        {
+            "label": "Save (all)",
+            "type": "shell",
+            "command": "make save_all"
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make clean"
+        }
+    ]
+}
