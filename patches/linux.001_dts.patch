@@ -1,0 +1,175 @@
+From adca239f5cfe92f2184186a233585d5c57d783cd Mon Sep 17 00:00:00 2001
+From: zjerina <zjerina@debian>
+Date: Thu, 5 Nov 2020 14:37:25 -0500
+Subject: [PATCH] aaa
+
+---
+ arch/arm/boot/dts/stm32f746.dtsi      | 33 ++++++++++++
+ arch/arm/boot/dts/stm32f769-disco.dts | 77 +++++++++++++++++++++++++++
+ include/dt-bindings/mfd/stm32f7-rcc.h |  1 +
+ 3 files changed, 111 insertions(+)
+
+diff --git a/arch/arm/boot/dts/stm32f746.dtsi b/arch/arm/boot/dts/stm32f746.dtsi
+index d26f93f8b9c2..921693a33ecd 100644
+--- a/arch/arm/boot/dts/stm32f746.dtsi
++++ b/arch/arm/boot/dts/stm32f746.dtsi
+@@ -48,6 +48,19 @@
+ 	#address-cells = <1>;
+ 	#size-cells = <1>;
+ 
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		linux,dma {
++			compatible = "shared-dma-pool";
++			linux,dma-default;
++			no-map;
++			size = <0x110000>; /* sram1 */
++		};
++	};
++
+ 	clocks {
+ 		clk_hse: clk-hse {
+ 			#clock-cells = <0>;
+@@ -564,6 +577,26 @@
+ 			};
+ 		};
+ 
++		ltdc: display-controller@40016800 {
++			compatible = "st,stm32-ltdc";
++			reg = <0x40016800 0x200>;
++			interrupts = <88>, <89>;
++			resets = <&rcc STM32F7_APB2_RESET(LTDC)>;
++			clocks = <&rcc 1 CLK_LCD>;
++			clock-names = "lcd";
++		};
++
++		dsi: dsi@40016c00 {
++			compatible = "st,stm32-dsi";
++			reg = <0x40016c00 0x800>;
++			interrupts = <98>;
++			clocks = <&rcc 1 CLK_F769_DSI>, <&clk_hse>;
++			clock-names = "pclk", "ref";
++			resets = <&rcc STM32F7_APB2_RESET(DSI)>;
++			reset-names = "apb";
++			status = "disabled";
++		};
++
+ 		pwrcfg: power-config@40007000 {
+ 			compatible = "syscon";
+ 			reg = <0x40007000 0x400>;
+diff --git a/arch/arm/boot/dts/stm32f769-disco.dts b/arch/arm/boot/dts/stm32f769-disco.dts
+index 6f1d0ac8c31c..d615ea17f9ab 100644
+--- a/arch/arm/boot/dts/stm32f769-disco.dts
++++ b/arch/arm/boot/dts/stm32f769-disco.dts
+@@ -75,6 +75,12 @@
+ 		};
+ 	};
+ 
++	backlight: backlight {
++		compatible = "gpio-backlight";
++		gpios = <&gpioi 14 GPIO_ACTIVE_HIGH>;
++		status = "okay";
++	};
++
+ 	gpio_keys {
+ 		compatible = "gpio-keys";
+ 		#address-cells = <1>;
+@@ -100,6 +106,69 @@
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+ 	};
++
++	vdd_dsi: vdd-dsi {
++		compatible = "regulator-fixed";
++		regulator-name = "vdd_dsi";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++};
++
++&dsi {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	phy-dsi-supply = <&vdd_dsi>;
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++			dsi_in: endpoint {
++				remote-endpoint = <&ltdc_out_dsi>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++			dsi_out: endpoint {
++				remote-endpoint = <&dsi_in_panel>;
++			};
++		};
++
++	};
++
++	panel@0 {
++		compatible = "orisetech,otm8009a";
++		reg = <0>; /* dsi virtual channel (0..3) */
++		reset-gpios = <&gpioj 15 GPIO_ACTIVE_LOW>;
++		backlight = <&backlight>;
++		power-supply = <&vdd_dsi>;
++		status = "okay";
++
++		port {
++			dsi_in_panel: endpoint {
++				remote-endpoint = <&dsi_out>;
++			};
++		};
++	};
++};
++
++&ltdc {
++	status = "okay";
++
++	port {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		ltdc_out_dsi: endpoint@0 {
++			reg = <0>;
++			remote-endpoint = <&dsi_in>;
++		};
++	};
+ };
+ 
+ &rcc {
+@@ -153,3 +222,11 @@
+ 	pinctrl-names = "default";
+ 	status = "okay";
+ };
++
++&dma1 {
++	status = "okay";
++};
++
++&dma2 {
++	status = "okay";
++};
+diff --git a/include/dt-bindings/mfd/stm32f7-rcc.h b/include/dt-bindings/mfd/stm32f7-rcc.h
+index a90f3613c584..ba5cb7456ee4 100644
+--- a/include/dt-bindings/mfd/stm32f7-rcc.h
++++ b/include/dt-bindings/mfd/stm32f7-rcc.h
+@@ -107,6 +107,7 @@
+ #define STM32F7_RCC_APB2_SAI1		22
+ #define STM32F7_RCC_APB2_SAI2		23
+ #define STM32F7_RCC_APB2_LTDC		26
++#define STM32F7_RCC_APB2_DSI		27
+ 
+ #define STM32F7_APB2_RESET(bit)	(STM32F7_RCC_APB2_##bit + (0x24 * 8))
+ #define STM32F7_APB2_CLOCK(bit)	(STM32F7_RCC_APB2_##bit + 0xA0)
+-- 
+2.20.1

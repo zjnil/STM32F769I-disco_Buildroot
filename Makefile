@@ -1,7 +1,7 @@
 url_buildroot = https://github.com/buildroot/buildroot.git
 dir_configs = configs
 dir_buildroot = buildroot
-commit_buildroot = 2020.08.1
+commit_buildroot = 2020.02.7
 dir_output = output
 
 bootstrap:
