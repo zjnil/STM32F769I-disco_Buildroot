@@ -1421,7 +1421,7 @@ BR2_PACKAGE_LIBPNG=y
 # hidapi needs udev /dev management and a toolchain w/ NPTL threads
 #
 # BR2_PACKAGE_JITTERENTROPY_LIBRARY is not set
-# BR2_PACKAGE_LCDAPI is not set
+BR2_PACKAGE_LCDAPI=y
 
 #
 # let-me-create needs a toolchain w/ C++, threads, dynamic library
@@ -1975,7 +1975,7 @@ BR2_PACKAGE_NCURSES_ADDITIONAL_TERMINFO=""
 #
 # Miscellaneous
 #
-# BR2_PACKAGE_BC is not set
+BR2_PACKAGE_BC=y
 # BR2_PACKAGE_GOOGLEFONTDIRECTORY is not set
 
 #
