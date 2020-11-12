@@ -1,16 +1,16 @@
-From adca239f5cfe92f2184186a233585d5c57d783cd Mon Sep 17 00:00:00 2001
+From a8a9b686f36dc19cfa3e0b65bb1bba5737c40463 Mon Sep 17 00:00:00 2001
 From: zjerina <zjerina@debian>
-Date: Thu, 5 Nov 2020 14:37:25 -0500
-Subject: [PATCH] aaa
+Date: Sat, 7 Nov 2020 11:24:05 -0500
+Subject: [PATCH] aaaaa
 
 ---
- arch/arm/boot/dts/stm32f746.dtsi      | 33 ++++++++++++
+ arch/arm/boot/dts/stm32f746.dtsi      | 60 +++++++++++++++++++++
  arch/arm/boot/dts/stm32f769-disco.dts | 77 +++++++++++++++++++++++++++
  include/dt-bindings/mfd/stm32f7-rcc.h |  1 +
- 3 files changed, 111 insertions(+)
+ 3 files changed, 138 insertions(+)
 
 diff --git a/arch/arm/boot/dts/stm32f746.dtsi b/arch/arm/boot/dts/stm32f746.dtsi
-index d26f93f8b9c2..921693a33ecd 100644
+index d26f93f8b9c2..39d1757e79e9 100644
 --- a/arch/arm/boot/dts/stm32f746.dtsi
 +++ b/arch/arm/boot/dts/stm32f746.dtsi
 @@ -48,6 +48,19 @@
@@ -60,6 +60,40 @@ index d26f93f8b9c2..921693a33ecd 100644
  		pwrcfg: power-config@40007000 {
  			compatible = "syscon";
  			reg = <0x40007000 0x400>;
+@@ -640,6 +673,33 @@
+ 			clock-names = "otg";
+ 			status = "disabled";
+ 		};
++
++		rng: rng@50060800 {
++			compatible = "st,stm32-rng";
++			reg = <0x50060800 0x400>;
++			interrupts = <80>;
++			clocks = <&rcc 0 STM32F7_AHB2_CLOCK(RNG)>;
++			resets = <&rcc STM32F7_AHB2_RESET(RNG)>;
++		};
++
++		hash1: hash@50060400 {
++			compatible = "st,stm32f756-hash";
++			reg = <0x50060400 0x400>;
++			interrupts = <80>;
++			clocks = <&rcc 0 STM32F7_AHB2_CLOCK(HASH)>;
++			resets = <&rcc STM32F7_AHB2_RESET(HASH)>;
++			dmas = <&dma2 7 2 0x400 0x0>;
++			dma-names = "in";
++			dma-maxburst = <0>;
++		};
++
++		crypto: crypto@50060000 {
++			compatible = "st,stm32f756-cryp";
++			reg = <0x50060000 0x400>;
++			interrupts = <79>;
++			clocks = <&rcc 0 STM32F7_AHB2_CLOCK(CRYP)>;
++			resets = <&rcc STM32F7_AHB2_RESET(CRYP)>;
++		};
+ 	};
+ };
+ 
 diff --git a/arch/arm/boot/dts/stm32f769-disco.dts b/arch/arm/boot/dts/stm32f769-disco.dts
 index 6f1d0ac8c31c..d615ea17f9ab 100644
 --- a/arch/arm/boot/dts/stm32f769-disco.dts

@@ -14,12 +14,23 @@ build:
 	cp $(dir_buildroot)/output/images/zImage ${dir_output}/
 	cp $(dir_buildroot)/output/build/linux-5.4.61/arch/arm/boot/dts/stm32f769-disco.dtb ${dir_output}/
 
+rebuild:
+	make clean all -C $(dir_buildroot)
+	cp $(dir_configs)/buildroot $(dir_buildroot)/.config
+	make -C $(dir_buildroot)
+	cp $(dir_buildroot)/output/images/zImage ${dir_output}/
+	cp $(dir_buildroot)/output/build/linux-5.4.61/arch/arm/boot/dts/stm32f769-disco.dtb ${dir_output}/
+
 flash_bootloader:
 	cd $(dir_buildroot)/output/build/host-openocd-0.10.0/tcl && ../../../host/usr/bin/openocd \
 		-f board/stm32f7discovery.cfg \
 		-c "program ../../../images/u-boot-spl.bin 0x08000000" \
 		-c "program ../../../images/u-boot.bin 0x08008000" \
 		-c "reset run" -c shutdown
+
+busybox_reconfigure:
+	make busybox-reconfigure -C $(dir_buildroot)
+	make -C $(dir_buildroot)
 
 linux_rebuild:
 	make linux-rebuild $(ARGS) -C $(dir_buildroot)

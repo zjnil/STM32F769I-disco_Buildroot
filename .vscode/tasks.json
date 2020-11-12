@@ -19,6 +19,16 @@
             "command": "make build"
         },
         {
+            "label": "Rebuild",
+            "type": "shell",
+            "command": "make rebuild"
+        },
+        {
+            "label": "Busybox reconfigure",
+            "type": "shell",
+            "command": "make busybox_reconfigure"
+        },
+        {
             "label": "Linux rebuild",
             "type": "shell",
             "command": "make linux_rebuild"
