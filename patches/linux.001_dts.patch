@@ -1,16 +1,16 @@
-From a8a9b686f36dc19cfa3e0b65bb1bba5737c40463 Mon Sep 17 00:00:00 2001
+From 0ac4038fe38bb278c2a72bbb581125c4049cd68e Mon Sep 17 00:00:00 2001
 From: zjerina <zjerina@debian>
-Date: Sat, 7 Nov 2020 11:24:05 -0500
-Subject: [PATCH] aaaaa
+Date: Mon, 16 Nov 2020 14:09:45 -0500
+Subject: [PATCH] aaa
 
 ---
- arch/arm/boot/dts/stm32f746.dtsi      | 60 +++++++++++++++++++++
- arch/arm/boot/dts/stm32f769-disco.dts | 77 +++++++++++++++++++++++++++
- include/dt-bindings/mfd/stm32f7-rcc.h |  1 +
- 3 files changed, 138 insertions(+)
+ arch/arm/boot/dts/stm32f746.dtsi      | 121 ++++++++++++++++++++
+ arch/arm/boot/dts/stm32f769-disco.dts | 152 ++++++++++++++++++++++++++
+ include/dt-bindings/mfd/stm32f7-rcc.h |   1 +
+ 3 files changed, 274 insertions(+)
 
 diff --git a/arch/arm/boot/dts/stm32f746.dtsi b/arch/arm/boot/dts/stm32f746.dtsi
-index d26f93f8b9c2..39d1757e79e9 100644
+index d26f93f8b9c2..a79cb359135b 100644
 --- a/arch/arm/boot/dts/stm32f746.dtsi
 +++ b/arch/arm/boot/dts/stm32f746.dtsi
 @@ -48,6 +48,19 @@
@@ -26,17 +26,84 @@ index d26f93f8b9c2..39d1757e79e9 100644
 +			compatible = "shared-dma-pool";
 +			linux,dma-default;
 +			no-map;
-+			size = <0x110000>; /* sram1 */
++			size = <0x110000>;
 +		};
 +	};
 +
  	clocks {
  		clk_hse: clk-hse {
  			#clock-cells = <0>;
-@@ -564,6 +577,26 @@
+@@ -75,6 +88,38 @@
+ 	};
+ 
+ 	soc {
++		mac: ethernet@40028000 {
++			compatible = "st,stm32-dwmac", "snps,dwmac-3.50a", "snps,dwmac";
++			reg = <0x40028000 0x8000>;
++			reg-names = "stmmaceth";
++
++			resets = <&rcc STM32F7_AHB1_RESET(ETHMAC)>;
++			reset-names = "stmmaceth";
++
++			clocks = <&rcc 0 STM32F7_AHB1_CLOCK(ETHMAC)>,
++				 <&rcc 0 STM32F7_AHB1_CLOCK(ETHMACTX)>,
++				 <&rcc 0 STM32F7_AHB1_CLOCK(ETHMACRX)>;
++			clock-names = "stmmaceth", "mac-clk-tx", "mac-clk-rx";
++
++			interrupts = <61>;
++			interrupt-names = "macirq";
++			snps,pbl = <8>;
++			st,syscon = <&syscfg 0x4>;
++			snps,mixed-burst;
++			phy-handle = <&phy0>;
++
++			status = "okay";
++
++			mdio0 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "snps,dwmac-mdio";
++				phy0: ethernet-phy@0 {
++					reg = <0>;
++				};
++			};
++		};
++
+ 		timer2: timer@40000000 {
+ 			compatible = "st,stm32-timer";
+ 			reg = <0x40000000 0x400>;
+@@ -564,6 +609,55 @@
  			};
  		};
  
++		sd_adc1: adc-1 {
++			compatible = "sd-modulator";
++			#io-channel-cells = <0>;
++		};
++
++		dfsdm: dfsdm@40017400 {
++			compatible = "st,stm32h7-dfsdm";
++			reg = <0x40017400 0x400>;
++			clocks = <&rcc 1 CLK_DFSDM1>;
++			clock-names = "dfsdm";
++			#interrupt-cells = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++		};
++
++		spi: spi@a0001000 {
++			compatible = "st,stm32f469-qspi";
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0xA0001000 0x1000>, <0x90000000 0x10000000>;
++			reg-names = "qspi", "qspi_mm";
++			interrupts = <92 1>;
++			spi-max-frequency = <108000000>;
++			clocks = <&rcc 0 (1 + 0x40)>; // clocks = <&rcc QSPI_K>;
++			resets = <&rcc (1 + (0x18 * 8))>; // resets = <&rcc QSPI_R>;
++			pinctrl-0 = <&qspi_pins>;
++		};
++
 +		ltdc: display-controller@40016800 {
 +			compatible = "st,stm32-ltdc";
 +			reg = <0x40016800 0x200>;
@@ -44,6 +111,7 @@ index d26f93f8b9c2..39d1757e79e9 100644
 +			resets = <&rcc STM32F7_APB2_RESET(LTDC)>;
 +			clocks = <&rcc 1 CLK_LCD>;
 +			clock-names = "lcd";
++			status = "disabled";
 +		};
 +
 +		dsi: dsi@40016c00 {
@@ -60,7 +128,7 @@ index d26f93f8b9c2..39d1757e79e9 100644
  		pwrcfg: power-config@40007000 {
  			compatible = "syscon";
  			reg = <0x40007000 0x400>;
-@@ -640,6 +673,33 @@
+@@ -640,6 +734,33 @@
  			clock-names = "otg";
  			status = "disabled";
  		};
@@ -95,7 +163,7 @@ index d26f93f8b9c2..39d1757e79e9 100644
  };
  
 diff --git a/arch/arm/boot/dts/stm32f769-disco.dts b/arch/arm/boot/dts/stm32f769-disco.dts
-index 6f1d0ac8c31c..d615ea17f9ab 100644
+index 6f1d0ac8c31c..0a06db93655b 100644
 --- a/arch/arm/boot/dts/stm32f769-disco.dts
 +++ b/arch/arm/boot/dts/stm32f769-disco.dts
 @@ -75,6 +75,12 @@
@@ -111,7 +179,7 @@ index 6f1d0ac8c31c..d615ea17f9ab 100644
  	gpio_keys {
  		compatible = "gpio-keys";
  		#address-cells = <1>;
-@@ -100,6 +106,69 @@
+@@ -100,6 +106,70 @@
  		regulator-min-microvolt = <3300000>;
  		regulator-max-microvolt = <3300000>;
  	};
@@ -168,6 +236,7 @@ index 6f1d0ac8c31c..d615ea17f9ab 100644
 +
 +&ltdc {
 +	status = "okay";
++	dma-ranges;
 +
 +	port {
 +		#address-cells = <1>;
@@ -181,7 +250,7 @@ index 6f1d0ac8c31c..d615ea17f9ab 100644
  };
  
  &rcc {
-@@ -153,3 +222,11 @@
+@@ -153,3 +223,85 @@
  	pinctrl-names = "default";
  	status = "okay";
  };
@@ -192,6 +261,80 @@ index 6f1d0ac8c31c..d615ea17f9ab 100644
 +
 +&dma2 {
 +	status = "okay";
++};
++
++&i2c4 {
++	pinctrl-0 = <&i2c4_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++	touchscreen@2a {
++		compatible = "focaltech,ft6236"; // ft6206 ?
++		reg = <0x2a>;
++		interrupts = <13 2>;
++		interrupt-parent = <&gpioi>;
++		interrupt-controller;
++		touchscreen-size-x = <480>;
++		touchscreen-size-y = <800>;
++		status = "okay";
++	};
++};
++
++&dfsdm {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&dfsdm_clkout_pins_a &dfsdm_data1_pins_a>;
++	pinctrl-1 = <&dfsdm_clkout_sleep_pins_a &dfsdm_data1_sleep_pins_a>;
++	spi-max-frequency = <2000000>;
++	status = "okay";
++
++	dfsdm_adc0: filter@0 {
++		compatible = "st,stm32-dfsdm-adc";
++		#io-channel-cells = <1>;
++		reg = <0>;
++		interrupts = <99>;
++		st,adc-channels = <1>;
++		st,adc-channel-names = "in1";
++		st,adc-channel-types = "SPI_R";
++		st,adc-channel-clk-src = "CLKOUT";
++		io-channels = <&sd_adc1>;
++		st,filter-order = <1>;
++		status = "okay";
++	};
++};
++
++&pinctrl {
++	ethernet_rmii: rmii@0 {
++		pins {
++			pinmux = <STM32_PINMUX('G',13, AF11)>, /* ETH_RMII_TXD0 */
++				 <STM32_PINMUX('G',14, AF11)>, /* ETH_RMII_TXD1 */
++				 <STM32_PINMUX('G',11, AF11)>, /* ETH_RMII_TX_EN */
++				 <STM32_PINMUX('A', 2, AF11)>, /* ETH_MDIO */
++				 <STM32_PINMUX('C', 1, AF11)>, /* ETH_MDC */
++				 <STM32_PINMUX('A', 1, AF11)>, /* ETH_RMII_REF_CLK */
++				 <STM32_PINMUX('A', 7, AF11)>, /* ETH_RMII_CRS_DV */
++				 <STM32_PINMUX('C', 4, AF11)>, /* ETH_RMII_RXD0 */
++				 <STM32_PINMUX('C', 5, AF11)>; /* ETH_RMII_RXD1 */
++			slew-rate = <2>;
++		};
++	};
++};
++
++&mac {
++	pinctrl-0 = <&ethernet_rmii>;
++	phy-mode = "rmii";
++
++	rx-fifo-depth = <128>;
++	tx-fifo-depth = <128>;
++};
++
++&spi {
++	status = "okay";
++	flash0: mx66l51235l {
++		compatible = "mx66l51235l";
++		spi-rx-bus-width = <4>;
++		spi-max-frequency = <108000000>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++	};
 +};
 diff --git a/include/dt-bindings/mfd/stm32f7-rcc.h b/include/dt-bindings/mfd/stm32f7-rcc.h
 index a90f3613c584..ba5cb7456ee4 100644
