@@ -1,14 +1,74 @@
-From 0ac4038fe38bb278c2a72bbb581125c4049cd68e Mon Sep 17 00:00:00 2001
+From 2082c6cc244fc5cc14ac41e87b5139319bc46fef Mon Sep 17 00:00:00 2001
 From: zjerina <zjerina@debian>
-Date: Mon, 16 Nov 2020 14:09:45 -0500
+Date: Fri, 20 Nov 2020 03:51:25 -0500
 Subject: [PATCH] aaa
 
 ---
- arch/arm/boot/dts/stm32f746.dtsi      | 121 ++++++++++++++++++++
- arch/arm/boot/dts/stm32f769-disco.dts | 152 ++++++++++++++++++++++++++
- include/dt-bindings/mfd/stm32f7-rcc.h |   1 +
- 3 files changed, 274 insertions(+)
+ arch/arm/boot/dts/stm32f7-pinctrl.dtsi |  48 ++++++++
+ arch/arm/boot/dts/stm32f746.dtsi       | 121 ++++++++++++++++++++
+ arch/arm/boot/dts/stm32f769-disco.dts  | 152 +++++++++++++++++++++++++
+ include/dt-bindings/mfd/stm32f7-rcc.h  |   1 +
+ 4 files changed, 322 insertions(+)
 
+diff --git a/arch/arm/boot/dts/stm32f7-pinctrl.dtsi b/arch/arm/boot/dts/stm32f7-pinctrl.dtsi
+index 9314128df185..f8c68e3ab14a 100644
+--- a/arch/arm/boot/dts/stm32f7-pinctrl.dtsi
++++ b/arch/arm/boot/dts/stm32f7-pinctrl.dtsi
+@@ -172,6 +172,54 @@
+ 				};
+ 			};
+ 
++			i2c4_pins: i2c4@0 {
++				pins {
++					pinmux = <STM32_PINMUX('D', 12, AF4)>, /* I2C4 SCL */
++						<STM32_PINMUX('B', 7, AF11)>; /* I2S4 SDA */
++					bias-disable;
++					drive-open-drain;
++				};
++			};
++
++			qspi_pins: qspi@0 {
++				pins {
++					pinmux = <STM32_PINMUX('B', 2, AF9)>, /* CLK */
++						 <STM32_PINMUX('B', 6, AF10)>, /* BK1_NCS */
++						 <STM32_PINMUX('C', 9, AF9)>, /* BK1_IO0 */
++						 <STM32_PINMUX('C',10, AF9)>, /* BK1_IO1 */
++						 <STM32_PINMUX('D',13, AF9)>, /* BK1_IO3 */
++						 <STM32_PINMUX('E', 2, AF9)>; /* BK1_IO2 */
++					slew-rate = <2>;
++				};
++			};
++
++			dfsdm_clkout_pins_a: dfsdm-clkout-pins-0 {
++				pins {
++					pinmux = <STM32_PINMUX('D', 3, AF3)>;     /* DFSDM_CKOUT */
++					bias-disable;
++					drive-push-pull;
++					slew-rate = <1>;
++				};
++			};
++
++			dfsdm_clkout_sleep_pins_a: dfsdm-clkout-sleep-pins-0 {
++				pins {
++					pinmux = <STM32_PINMUX('D', 3, ANALOG)>;  /* DFSDM_CKOUT */
++				};
++			};
++
++			dfsdm_data1_pins_a: dfsdm-data1-pins-0 {
++				pins {
++					pinmux = <STM32_PINMUX('C', 3, AF3)>;      /* DFSDM_DATA1 */
++				};
++			};
++
++			dfsdm_data1_sleep_pins_a: dfsdm-data1-sleep-pins-0 {
++				pins {
++					pinmux = <STM32_PINMUX('C', 3, ANALOG)>;   /* DFSDM_DATA1 */
++				};
++			};
++
+ 			usbotg_hs_pins_a: usbotg-hs@0 {
+ 				pins {
+ 					pinmux = <STM32_PINMUX('H', 4, AF10)>, /* OTG_HS_ULPI_NXT */
 diff --git a/arch/arm/boot/dts/stm32f746.dtsi b/arch/arm/boot/dts/stm32f746.dtsi
 index d26f93f8b9c2..a79cb359135b 100644
 --- a/arch/arm/boot/dts/stm32f746.dtsi

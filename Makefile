@@ -12,14 +12,14 @@ bootstrap:
 build:
 	make -C $(dir_buildroot)
 	cp $(dir_buildroot)/output/images/zImage ${dir_output}/
-	cp $(dir_buildroot)/output/build/linux-5.4.61/arch/arm/boot/dts/stm32f769-disco.dtb ${dir_output}/
+	cp $(dir_buildroot)/output/build/linux-5.4.77/arch/arm/boot/dts/stm32f769-disco.dtb ${dir_output}/
 
 rebuild:
 	make clean all -C $(dir_buildroot)
 	cp $(dir_configs)/buildroot $(dir_buildroot)/.config
 	make -C $(dir_buildroot)
 	cp $(dir_buildroot)/output/images/zImage ${dir_output}/
-	cp $(dir_buildroot)/output/build/linux-5.4.61/arch/arm/boot/dts/stm32f769-disco.dtb ${dir_output}/
+	cp $(dir_buildroot)/output/build/linux-5.4.77/arch/arm/boot/dts/stm32f769-disco.dtb ${dir_output}/
 
 flash_bootloader:
 	cd $(dir_buildroot)/output/build/host-openocd-0.10.0/tcl && ../../../host/usr/bin/openocd \
@@ -35,12 +35,12 @@ busybox_reconfigure:
 linux_rebuild:
 	make linux-rebuild $(ARGS) -C $(dir_buildroot)
 	cp $(dir_buildroot)/output/images/zImage $(dir_output)/
-	cp $(dir_buildroot)/output/build/linux-5.4.61/arch/arm/boot/dts/stm32f769-disco.dtb $(dir_output)/
+	cp $(dir_buildroot)/output/build/linux-5.4.77/arch/arm/boot/dts/stm32f769-disco.dtb $(dir_output)/
 
 linux_reconfigure:
 	make linux-reconfigure $(ARGS) -C $(dir_buildroot)
 	cp $(dir_buildroot)/output/images/zImage $(dir_output)/
-	cp $(dir_buildroot)/output/build/linux-5.4.61/arch/arm/boot/dts/stm32f769-disco.dtb $(dir_output)/
+	cp $(dir_buildroot)/output/build/linux-5.4.77/arch/arm/boot/dts/stm32f769-disco.dtb $(dir_output)/
 
 uboot_rebuild:
 	make uboot-dirclean -C $(dir_buildroot)
